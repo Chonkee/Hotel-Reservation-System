@@ -109,8 +109,8 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Set one room to occupied and one to maintenance for demo
-        Room::where('room_number', '101')->update(['status' => 'occupied']);
-        Room::where('room_number', '201')->update(['status' => 'maintenance']);
+        // // Set one room to occupied and one to maintenance for demo
+        // Room::where('room_number', '101')->update(['status' => 'occupied']);
+        // Room::where('room_number', '201')->update(['status' => 'maintenance']);
     }
 }

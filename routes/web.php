@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Guest\HomePage;
 use App\Livewire\Guest\RoomBrowse;
 use App\Livewire\Guest\RoomSearch;
 use App\Livewire\Guest\ReservationCreate;
@@ -9,7 +10,7 @@ use App\Livewire\Admin\RoomManagement;
 use App\Livewire\Admin\ReservationManagement;
 
 // Public routes
-Route::get('/', RoomBrowse::class)->name('home');
+Route::get('/', HomePage::class)->name('home');
 Route::get('/rooms', RoomBrowse::class)->name('rooms.browse');
 
 require __DIR__.'/auth.php';

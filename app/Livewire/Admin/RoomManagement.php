@@ -1,4 +1,5 @@
 <?php
+// app/Livewire/Admin/RoomManagement.php
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
@@ -31,6 +32,7 @@ class RoomManagement extends Component
     public $type_name;
     public $capacity;
     public $amenities = [];
+    public $newAmenity = '';
 
     protected $rules = [
         'room_number' => 'required|string|unique:rooms,room_number',
@@ -124,6 +126,20 @@ class RoomManagement extends Component
         $this->loadData();
     }
 
+    public function addAmenity()
+    {
+        if (!empty($this->newAmenity)) {
+            $this->amenities[] = $this->newAmenity;
+            $this->newAmenity = '';
+        }
+    }
+
+    public function removeAmenity($index)
+    {
+        unset($this->amenities[$index]);
+        $this->amenities = array_values($this->amenities);
+    }
+
     public function saveRoomType()
     {
         $this->validate([
@@ -154,6 +170,7 @@ class RoomManagement extends Component
         $this->type_name = '';
         $this->capacity = '';
         $this->amenities = [];
+        $this->newAmenity = '';
     }
 
     public function resetForm()

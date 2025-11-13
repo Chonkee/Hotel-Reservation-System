@@ -6,6 +6,7 @@ use App\Models\Room;
 use App\Models\RoomType;
 use Carbon\Carbon;
 use Livewire\Attributes\Validate;
+use Illuminate\Support\Facades\Log;
 
 class RoomSearch extends Component
 {
@@ -25,7 +26,7 @@ class RoomSearch extends Component
 
     public function searchRooms()
     {
-        $validated = $this->validate([
+        $this->validate([
             'checkInDate' => 'required|date|after_or_equal:today',
             'checkOutDate' => 'required|date|after:checkInDate',
             'numberOfGuests' => 'required|integer|min:1',
@@ -41,22 +42,23 @@ class RoomSearch extends Component
                         && $room->roomType->capacity >= $this->numberOfGuests;
                 });
 
-            // Group by room type and convert to array for blade
-            $this->availableRooms = $availableRooms->groupBy('room_type_id')->toArray();
-
+            // Store as collection
+            $this->availableRooms = $availableRooms->values()->all();
             $this->searchPerformed = true;
             $this->selectedRooms = [];
         } catch (\Exception $e) {
             session()->flash('error', 'Error searching rooms: ' . $e->getMessage());
-            \Log::error('Room search error: ' . $e->getMessage());
+            Log::error('Room search error: ' . $e->getMessage());
         }
     }
 
     public function toggleRoomSelection($roomId)
     {
         if (in_array($roomId, $this->selectedRooms)) {
-            $this->selectedRooms = array_diff($this->selectedRooms, [$roomId]);
+            // Remove the room from selection
+            $this->selectedRooms = array_values(array_diff($this->selectedRooms, [$roomId]));
         } else {
+            // Add the room if we haven't reached the limit
             if (count($this->selectedRooms) < $this->numberOfRooms) {
                 $this->selectedRooms[] = $roomId;
             }
@@ -83,7 +85,28 @@ class RoomSearch extends Component
     }
 
     public function render()
-    {
-        return view('livewire.guest.room-search');
+{
+    // Always initialize groupedRooms as empty collection
+    $groupedRooms = collect([]);
+    
+    if ($this->searchPerformed && is_array($this->availableRooms) && count($this->availableRooms) > 0) {
+        // Extract room IDs from stored data
+        $roomIds = collect($this->availableRooms)->map(function ($roomData) {
+            if ($roomData instanceof Room) {
+                return $roomData->id;
+            }
+            return is_array($roomData) ? ($roomData['id'] ?? null) : null;
+        })->filter()->toArray();
+        
+        // Fetch fresh room models from database
+        if (!empty($roomIds)) {
+            $rooms = Room::with('roomType')->whereIn('id', $roomIds)->get();
+            $groupedRooms = $rooms->groupBy('room_type_id');
+        }
     }
+    
+    return view('livewire.guest.room-search', [
+        'groupedRooms' => $groupedRooms
+    ]);
+}
 }

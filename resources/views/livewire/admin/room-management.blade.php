@@ -202,7 +202,7 @@
     <!-- Room Type Modal -->
     @if($showTypeModal)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 max-w-lg w-full">
+            <div class="bg-white rounded-lg p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Add Room Type</h2>
 
                 <form wire:submit.prevent="saveRoomType">
@@ -227,6 +227,51 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             >
                             @error('capacity') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Amenities Section -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
+                            
+                            <!-- Add Amenity Input -->
+                            <div class="flex gap-2 mb-3">
+                                <input 
+                                    type="text" 
+                                    wire:model="newAmenity"
+                                    wire:keydown.enter.prevent="addAmenity"
+                                    placeholder="Enter amenity (e.g., Wi-Fi, TV)"
+                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                >
+                                <button 
+                                    type="button"
+                                    wire:click="addAmenity"
+                                    class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                                >
+                                    Add
+                                </button>
+                            </div>
+
+                            <!-- Amenities List -->
+                            @if(count($amenities) > 0)
+                                <div class="space-y-2">
+                                    @foreach($amenities as $index => $amenity)
+                                        <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                                            <span class="text-gray-700">{{ $amenity }}</span>
+                                            <button 
+                                                type="button"
+                                                wire:click="removeAmenity({{ $index }})"
+                                                class="text-red-600 hover:text-red-800"
+                                            >
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-sm text-gray-500 italic">No amenities added yet</p>
+                            @endif
                         </div>
                     </div>
 
